@@ -1,0 +1,3 @@
+// API Gateway - Application Layer
+// This layer contains DTOs and Use Cases
+// No Spring annotations unless necessary

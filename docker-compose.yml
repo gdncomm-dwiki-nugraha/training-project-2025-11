@@ -1,0 +1,123 @@
+version: '3.8'
+
+services:
+  # PostgreSQL for Member Service
+  member-db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: memberdb
+      POSTGRES_USER: member
+      POSTGRES_PASSWORD: member123
+    ports:
+      - "5432:5432"
+    volumes:
+      - member-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U member"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # PostgreSQL for Product Service
+  product-db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: productdb
+      POSTGRES_USER: product
+      POSTGRES_PASSWORD: product123
+    ports:
+      - "5433:5432"
+    volumes:
+      - product-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U product"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # Redis for Cart Service
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "PING"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # Member Service
+  member-service:
+    build:
+      context: .
+      dockerfile: member/Dockerfile
+    depends_on:
+      member-db:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_HOST: member-db
+      DB_PORT: 5432
+      DB_NAME: memberdb
+      DB_USER: member
+      DB_PASSWORD: member123
+    ports:
+      - "8081:8081"
+
+  # Product Service
+  product-service:
+    build:
+      context: .
+      dockerfile: product/Dockerfile
+    depends_on:
+      product-db:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_HOST: product-db
+      DB_PORT: 5432
+      DB_NAME: productdb
+      DB_USER: product
+      DB_PASSWORD: product123
+    ports:
+      - "8082:8082"
+
+  # Cart Service
+  cart-service:
+    build:
+      context: .
+      dockerfile: cart/Dockerfile
+    depends_on:
+      redis:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    ports:
+      - "8083:8083"
+
+  # API Gateway
+  api-gateway:
+    build:
+      context: .
+      dockerfile: api-gateway/Dockerfile
+    depends_on:
+      - member-service
+      - product-service
+      - cart-service
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      JWT_SECRET: change-this-in-prod
+      SERVICES_MEMBER: http://member-service:8081
+      SERVICES_PRODUCT: http://product-service:8082
+      SERVICES_CART: http://cart-service:8083
+    ports:
+      - "8080:8080"
+
+volumes:
+  member-db-data:
+  product-db-data:
+  redis-data:

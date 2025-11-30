@@ -1,0 +1,3 @@
+// Cart Service - Infrastructure Layer
+// This layer contains controllers, JPA entities, repository implementations, configs
+// Spring annotations are allowed here

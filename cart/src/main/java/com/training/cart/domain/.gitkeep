@@ -1,0 +1,3 @@
+// Cart Service - Domain Layer
+// This layer contains pure Java classes with NO Spring annotations
+// Entities, domain services, interfaces, and exceptions belong here

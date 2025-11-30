@@ -1,0 +1,35 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+
+# Service URLs for routing
+services:
+  member:
+    url: http://localhost:8081
+  product:
+    url: http://localhost:8082
+  cart:
+    url: http://localhost:8083
+
+# JWT Configuration
+jwt:
+  secret: my-secret-key-for-jwt-signing-minimum-256-bits-required-for-hs256-algorithm
+  expiration-hours: 24
+  provider:
+    type: HMAC
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: when-authorized
+
+logging:
+  level:
+    com.training.apigateway: INFO

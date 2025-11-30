@@ -1,0 +1,16 @@
+com\training\product\domain\service\Specification.class
+com\training\product\infrastructure\persistence\repository\JpaProductRepository.class
+com\training\product\infrastructure\persistence\repository\SpringDataProductRepository.class
+com\training\product\application\usecase\GetProductDetailUseCase.class
+com\training\product\infrastructure\config\ProductConfig.class
+com\training\product\infrastructure\persistence\entity\ProductEntity.class
+com\training\product\domain\exception\ProductNotFoundException.class
+com\training\product\application\dto\PagedProductResponse.class
+com\training\product\application\dto\ProductResponse.class
+com\training\product\ProductApplication.class
+com\training\product\domain\repository\ProductRepository.class
+com\training\product\infrastructure\persistence\mapper\ProductMapper.class
+com\training\product\infrastructure\web\GlobalExceptionHandler.class
+com\training\product\domain\model\Product.class
+com\training\product\application\usecase\SearchProductUseCase.class
+com\training\product\infrastructure\web\ProductController.class

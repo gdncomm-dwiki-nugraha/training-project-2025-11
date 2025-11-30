@@ -1,0 +1,16 @@
+D:\office\training\training-project-2025-11\product\src\main\java\com\training\product\domain\model\Product.java
+D:\office\training\training-project-2025-11\product\src\main\java\com\training\product\domain\repository\ProductRepository.java
+D:\office\training\training-project-2025-11\product\src\main\java\com\training\product\application\dto\ProductResponse.java
+D:\office\training\training-project-2025-11\product\src\main\java\com\training\product\infrastructure\web\GlobalExceptionHandler.java
+D:\office\training\training-project-2025-11\product\src\main\java\com\training\product\infrastructure\persistence\entity\ProductEntity.java
+D:\office\training\training-project-2025-11\product\src\main\java\com\training\product\infrastructure\persistence\repository\JpaProductRepository.java
+D:\office\training\training-project-2025-11\product\src\main\java\com\training\product\application\usecase\SearchProductUseCase.java
+D:\office\training\training-project-2025-11\product\src\main\java\com\training\product\domain\exception\ProductNotFoundException.java
+D:\office\training\training-project-2025-11\product\src\main\java\com\training\product\infrastructure\persistence\mapper\ProductMapper.java
+D:\office\training\training-project-2025-11\product\src\main\java\com\training\product\infrastructure\config\ProductConfig.java
+D:\office\training\training-project-2025-11\product\src\main\java\com\training\product\application\dto\PagedProductResponse.java
+D:\office\training\training-project-2025-11\product\src\main\java\com\training\product\infrastructure\persistence\repository\SpringDataProductRepository.java
+D:\office\training\training-project-2025-11\product\src\main\java\com\training\product\infrastructure\web\ProductController.java
+D:\office\training\training-project-2025-11\product\src\main\java\com\training\product\domain\service\Specification.java
+D:\office\training\training-project-2025-11\product\src\main\java\com\training\product\application\usecase\GetProductDetailUseCase.java
+D:\office\training\training-project-2025-11\product\src\main\java\com\training\product\ProductApplication.java

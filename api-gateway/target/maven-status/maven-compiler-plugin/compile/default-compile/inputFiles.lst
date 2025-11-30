@@ -1,0 +1,17 @@
+D:\office\training\training-project-2025-11\api-gateway\src\main\java\com\training\apigateway\infrastructure\config\SecurityConfig.java
+D:\office\training\training-project-2025-11\api-gateway\src\main\java\com\training\apigateway\application\usecase\AuthenticateUserUseCase.java
+D:\office\training\training-project-2025-11\api-gateway\src\main\java\com\training\apigateway\infrastructure\adapter\MemberAuthPortImpl.java
+D:\office\training\training-project-2025-11\api-gateway\src\main\java\com\training\apigateway\infrastructure\web\GlobalExceptionHandler.java
+D:\office\training\training-project-2025-11\api-gateway\src\main\java\com\training\apigateway\infrastructure\config\GatewayConfig.java
+D:\office\training\training-project-2025-11\api-gateway\src\main\java\com\training\apigateway\ApiGatewayApplication.java
+D:\office\training\training-project-2025-11\api-gateway\src\main\java\com\training\apigateway\domain\model\AuthUser.java
+D:\office\training\training-project-2025-11\api-gateway\src\main\java\com\training\apigateway\application\dto\LoginRequest.java
+D:\office\training\training-project-2025-11\api-gateway\src\main\java\com\training\apigateway\infrastructure\security\jwt\HmacJwtProvider.java
+D:\office\training\training-project-2025-11\api-gateway\src\main\java\com\training\apigateway\domain\service\JwtProvider.java
+D:\office\training\training-project-2025-11\api-gateway\src\main\java\com\training\apigateway\application\port\MemberAuthPort.java
+D:\office\training\training-project-2025-11\api-gateway\src\main\java\com\training\apigateway\infrastructure\security\filter\JwtAuthenticationFilter.java
+D:\office\training\training-project-2025-11\api-gateway\src\main\java\com\training\apigateway\infrastructure\security\jwt\JwtProviderFactoryImpl.java
+D:\office\training\training-project-2025-11\api-gateway\src\main\java\com\training\apigateway\application\dto\LoginResponse.java
+D:\office\training\training-project-2025-11\api-gateway\src\main\java\com\training\apigateway\domain\exception\InvalidJwtException.java
+D:\office\training\training-project-2025-11\api-gateway\src\main\java\com\training\apigateway\domain\service\JwtProviderFactory.java
+D:\office\training\training-project-2025-11\api-gateway\src\main\java\com\training\apigateway\infrastructure\web\AuthController.java
