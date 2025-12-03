@@ -153,6 +153,18 @@
 			<scope>runtime</scope>
 		</dependency>
 
+		<!-- Flyway Database Migration -->
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-core</artifactId>
+		</dependency>
+
+		<!-- Flyway PostgreSQL Support -->
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-database-postgresql</artifactId>
+		</dependency>
+
 	</dependencies>
 
 	<!-- BUILD SETUP -->
@@ -230,16 +242,6 @@
 			</plugin>
 		</plugins>
 
-		<resources>
-			<resource>
-				<directory>src/main/resources</directory>
-				<includes>
-					<include>db/migration/**</include>
-					<include>application.properties</include>
-					<include>application-*.properties</include>
-				</includes>
-			</resource>
-		</resources>
 	</build>
 
 </project>
