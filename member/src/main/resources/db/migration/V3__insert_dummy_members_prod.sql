@@ -1,48 +1,23 @@
--- ======================================================
---  STATIC SEED DATA (2 USERS)
--- ======================================================
-
--- Clear table (safe for prod dummy seeding)
+-- Clear members table
 DELETE FROM members;
 
--- Insert STATIC test member #1
-INSERT INTO members (
-    id, full_name, email, password_hash, phone_number, avatar_url, created_at, updated_at
-) VALUES (
-    '11111111-1111-1111-1111-111111111111',
-    'Test User',
-    'test.user@example.com',
-    '$2a$10$KbQi2CqkfNNpJBWlAbIYW.sdN6iYG3PaY5E9OQj1YxDCEV4VpWw2e', -- Password123!
-    '081234567890',
-    'https://i.pravatar.cc/150?img=11',
-    NOW() - INTERVAL '10 days',
-    NOW() - INTERVAL '1 day'
-);
+-- STATIC DUMMY USERS (2 fixed)
+INSERT INTO members (id, full_name, email, password_hash, phone_number, avatar_url, created_at, updated_at)
+VALUES
+    (gen_random_uuid(), 'Test User', 'testuser@example.com',
+        '$2a$10$eB7oS1hLkKxD9n8gK3wQzu7F3o6pO5Vb7d1s43g0KQKb1x0u0n9y6',
+        '081234567800', NULL, NOW() - INTERVAL '10 days', NOW()),
 
--- Insert STATIC test member #2
-INSERT INTO members (
-    id, full_name, email, password_hash, phone_number, avatar_url, created_at, updated_at
-) VALUES (
-    '22222222-2222-2222-2222-222222222222',
-    'Admin User',
-    'admin@example.com',
-    '$2a$10$KbQi2CqkfNNpJBWlAbIYW.sdN6iYG3PaY5E9OQj1YxDCEV4VpWw2e', -- Password123!
-    '089876543210',
-    'https://i.pravatar.cc/150?img=22',
-    NOW() - INTERVAL '20 days',
-    NOW() - INTERVAL '3 days'
-);
+    (gen_random_uuid(), 'Demo Member', 'demo@example.com',
+        '$2a$10$eB7oS1hLkKxD9n8gK3wQzu7F3o6pO5Vb7d1s43g0KQKb1x0u0n9y6',
+        '081234567801', NULL, NOW() - INTERVAL '5 days', NOW());
 
--- ======================================================
---  DYNAMIC BULK DATA (up to 5000 members)
--- ======================================================
-
+-- DYNAMIC GENERATOR (up to 5000 users)
 WITH RECURSIVE seq(n) AS (
     SELECT 1
     UNION ALL
-    SELECT n + 1 FROM seq WHERE n < 5000   -- change to 50/5000 as needed
+    SELECT n + 1 FROM seq WHERE n < 5000
 ),
-
 first_names AS (
     SELECT ARRAY[
         'Ahmad','Budi','Citra','Dewi','Eka','Fitri','Gita','Hadi','Indah','Joko',
@@ -52,7 +27,6 @@ first_names AS (
         'Rina','Ari','Dian','Yudi','Sri','Tari','Eko','Mega','Bambang'
     ]::text[] AS arr
 ),
-
 last_names AS (
     SELECT ARRAY[
         'Pratama','Santoso','Wijaya','Kusuma','Saputra','Wibowo','Permata','Kusumah','Hartono','Gunawan',
@@ -62,7 +36,6 @@ last_names AS (
         'Irawan','Ananda','Suharto','Rahayu','Widodo','Halim','Tarigan','Yuniar','Adiputra','Cahyani'
     ]::text[] AS arr
 ),
-
 names AS (
     SELECT 
         n,
@@ -84,4 +57,5 @@ SELECT
         ELSE NULL
     END AS avatar_url,
     NOW() - ((n % 730) || ' days')::interval,
-    NOW() - ((n % 30) || ' days')::interval;
+    NOW() - ((n % 30) || ' days')::interval
+FROM names;
