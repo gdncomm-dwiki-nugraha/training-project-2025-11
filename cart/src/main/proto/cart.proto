@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package com.gdn.training.cart.grpc;
+
+option java_multiple_files = true;
+option java_package = "com.gdn.training.cart.grpc";
+option java_outer_classname = "CartProto";
+
+import "google/protobuf/timestamp.proto";
+
+service CartService {
+  rpc GetCart(GetCartRequest) returns (GetCartResponse);
+}
+
+message GetCartRequest {
+  string memberId = 1;
+}
+
+message CartItemMessage {
+  string id = 1;
+  string productId = 2;
+  int32 quantity = 3;
+}
+
+message CartMessage {
+  string cartId = 1;
+  string memberId = 2;
+  google.protobuf.Timestamp createdAt = 3;
+  google.protobuf.Timestamp updatedAt = 4;
+  repeated CartItemMessage items = 5;
+}
+
+message GetCartResponse {
+  CartMessage cart = 1;
+}
