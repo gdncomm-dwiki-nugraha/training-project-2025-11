@@ -26,6 +26,24 @@ services:
       - network-service
 
   # ============================
+  # PG ADMIN UI
+  # ============================
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    restart: always
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@gdn.local
+      PGADMIN_DEFAULT_PASSWORD: postgres
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - network-service
+
+  # ============================
   # REDIS CACHE
   # ============================
   redis:
@@ -65,8 +83,8 @@ services:
       SPRING_REDIS_HOST: redis
 
     ports:
-      - "9095:9095"   # gRPC
-      - "8081:8081"   # Actuator / REST admin
+      - "9095:9095"  # gRPC
+      - "8081:8081"  # Actuator / REST admin
     networks:
       - network-service
 
@@ -84,14 +102,12 @@ services:
     ports:
       - "8080:8080"
     environment:
-      # gRPC config (important!)
       grpc.member.host: member-service
       grpc.member.port: 9095
 
       # JWT secret
       security.jwt.hmac.secret: replace-with-very-long-secret-32bytes-min!!!!
 
-      # Profile
       SPRING_PROFILES_ACTIVE: prod
     networks:
       - network-service
