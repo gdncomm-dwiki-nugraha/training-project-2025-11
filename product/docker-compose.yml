@@ -1,0 +1,96 @@
+version: "3.9"
+
+services:
+  # ============================
+  # PostgreSQL for product-service
+  # ============================
+  product-postgres:
+    image: postgres:16
+    container_name: product-postgres
+    restart: always
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_DB: productdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - product-postgres-data:/var/lib/postgresql/data
+    networks:
+      - product-net
+
+  # ============================
+  # Solr for product search
+  # ============================
+  solr:
+    image: solr:9.6
+    container_name: product-solr
+    restart: always
+    ports:
+      - "8983:8983"
+    environment:
+      SOLR_HEAP: 1g
+    command:
+      - solr-precreate
+      - products
+    volumes:
+      - solr-data:/var/solr
+    networks:
+      - product-net
+
+  # ============================
+  # Product Service
+  # ============================
+  product-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: product-service
+    restart: always
+    depends_on:
+      - product-postgres
+      - solr
+    ports:
+      - "8082:8080"   # external:internal
+    environment:
+      # ---- Spring Boot App Info ----
+      SPRING_APPLICATION_NAME: product-service
+      SERVER_PORT: 8080
+
+      # ---- PostgreSQL ----
+      SPRING_DATASOURCE_URL: jdbc:postgresql://product-postgres:5432/productdb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+
+      # ---- Solr ----
+      SPRING_DATA_SOLR_HOST: http://solr:8983/solr/products
+
+      # ---- Seeder ----
+      PRODUCT_SEED_ENABLED: "true"
+      PRODUCT_SEED_SIZE: 50    # change to 50000 for staging/prod
+
+    networks:
+      - product-net
+
+  # ============================
+  # pgAdmin (optional)
+  # ============================
+  pgadmin:
+    image: dpage/pgadmin4:8
+    container_name: product-pgadmin
+    restart: always
+    ports:
+      - "8091:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@gdn.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    networks:
+      - product-net
+
+networks:
+  product-net:
+
+volumes:
+  product-postgres-data:
+  solr-data:
