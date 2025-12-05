@@ -5,21 +5,18 @@ FROM maven:3.9.6-eclipse-temurin-21 AS builder
 
 WORKDIR /app
 
-# copy pom + source
+# Copy pom & source
 COPY pom.xml .
+COPY libs ./libs
 COPY src ./src
 
-# COPY local dependency (common-proto)
-COPY libs ./libs
-
-# Build project
-RUN mvn clean package -DskipTests
+RUN mvn -Dmaven.repo.local=/root/.m2/repository clean package -DskipTests
 
 
 ###########################################
 # 2. RUNTIME STAGE (Slim JRE 21)
 ###########################################
-FROM eclipse-temurin:21-jre
+FROM eclipse-temurin:21-jre-jammy
 
 WORKDIR /app
 
