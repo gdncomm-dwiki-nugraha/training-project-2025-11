@@ -1,6 +1,7 @@
 package com.gdn.training.product.infrastructure.config;
 
 import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.impl.Http2SolrClient;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -13,7 +14,7 @@ public class SolrConfig {
 
     // Constructor
     public SolrConfig(
-            @Value("${spring.data.solr.host:http://localhost:8983}") String solrUrl) {
+            @Value("${solr.host:http://localhost:8983/solr}") String solrUrl) {
         this.solrUrl = solrUrl;
     }
 

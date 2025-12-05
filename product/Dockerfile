@@ -5,73 +5,49 @@ FROM maven:3.9.6-eclipse-temurin-21 AS builder
 
 WORKDIR /app
 
-# ------------------------------------------------
-# Copy pom.xml first for dependency caching
-# ------------------------------------------------
+# Copy project and build
 COPY pom.xml .
-
-# Download dependencies (can be cached if pom.xml unchanged)
-RUN mvn -DskipTests dependency:go-offline
-
-# ------------------------------------------------
-# Copy full project and build JAR
-# ------------------------------------------------
 COPY src ./src
 
-RUN mvn -DskipTests clean package
+RUN mvn clean package -DskipTests
 
 
 ###########################################
 # 2. RUNTIME STAGE (Slim JRE 21)
 ###########################################
 FROM eclipse-temurin:21-jre
+
 WORKDIR /app
 
-# ------------------------------------------------
-# Copy ANY jar generated
-# ------------------------------------------------
+# Copy JAR from builder
 COPY --from=builder /app/target/*.jar app.jar
 
-# ------------------------------------------------
-# Allow Hibernate temp usage (best practice)
-# ------------------------------------------------
-VOLUME /tmp
+# Install wget and grpc_health_probe
+RUN apt-get update && \
+    apt-get install -y wget && \
+    wget -qO /bin/grpc_health_probe \
+    https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/v0.4.24/grpc_health_probe-linux-amd64 && \
+    chmod +x /bin/grpc_health_probe && \
+    rm -rf /var/lib/apt/lists/*
 
-# ------------------------------------------------
+# Create non-root user
+RUN groupadd -r appuser && \
+    useradd -r -g appuser appuser && \
+    chown -R appuser:appuser /app
+
 # Expose ports
-# - gRPC default port
-# - Spring Boot / actuator port
-# ------------------------------------------------
-EXPOSE 9095
-EXPOSE 8081
+EXPOSE 9096 8080
 
-# ------------------------------------------------
-# Environment variables for runtime
-# ------------------------------------------------
+# Environment variables
+ENV SPRING_PROFILES_ACTIVE=prod \
+    JAVA_OPTS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=75 -XX:+UseG1GC"
 
-# Overrideable by docker run / compose
-ENV SPRING_PROFILES_ACTIVE=prod
-ENV DB_URL=""
-ENV DB_USER=""
-ENV DB_PASSWORD=""
-ENV REDIS_HOST=""
-ENV REDIS_PORT=6379
+# Health check
+HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
+    CMD ["/bin/grpc_health_probe", "-addr=:9096"]
 
-# JVM container optimization
-ENV JAVA_OPTS="\
-    -XX:+UseContainerSupport \
-    -XX:MaxRAMPercentage=75 \
-    -XX:+UseG1GC \
-    "
+# Run as non-root
+USER appuser
 
-# ------------------------------------------------
-# HEALTHCHECK (optional but recommended)
-# Will attempt to check actuator if enabled
-# ------------------------------------------------
-HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
-    CMD wget -qO- http://localhost:8081/actuator/health || exit 1
-
-# ------------------------------------------------
-# ENTRY POINT
-# ------------------------------------------------
+# Start application
 ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]

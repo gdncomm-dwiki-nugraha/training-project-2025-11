@@ -31,8 +31,8 @@
 		<java.version>21</java.version>
 
 		<!-- manually define GRPC + protobuf -->
-		<grpc.version>1.59.0</grpc.version>
-		<protobuf.version>3.25.1</protobuf.version>
+		<protobuf.version>4.28.2</protobuf.version>
+		<grpc.version>1.68.0</grpc.version>
 		<!-- test container -->
 		<testcontainers.version>1.19.0</testcontainers.version>
 	</properties>
@@ -88,6 +88,12 @@
 			<artifactId>grpc-stub</artifactId>
 			<version>${grpc.version}</version>
 		</dependency>
+		<!-- GRPC Spring Boot Starter -->
+		<dependency>
+			<groupId>net.devh</groupId>
+			<artifactId>grpc-server-spring-boot-starter</artifactId>
+			<version>3.1.0.RELEASE</version>
+		</dependency>
 		<!-- Annotation API -->
 		<dependency>
 			<groupId>javax.annotation</groupId>
@@ -132,6 +138,23 @@
 			<artifactId>solr</artifactId>
 			<version>${testcontainers.version}</version>
 		</dependency>
+
+		<!-- MapStruct -->
+		<dependency>
+			<groupId>org.mapstruct</groupId>
+			<artifactId>mapstruct</artifactId>
+			<version>1.5.5.Final</version>
+		</dependency>
+
+		<!-- Flyway -->
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-database-postgresql</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -151,14 +174,45 @@
 				<artifactId>testcontainers</artifactId>
 				<version>1.19.0</version>
 			</plugin>
+
 			<!-- Java Compiler -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.13.0</version>
 				<configuration>
 					<source>${java.version}</source>
 					<target>${java.version}</target>
+					<!-- Force MapStruct/annotations output to separate dir -->
+					<generatedSourcesDirectory>
+						${project.build.directory}/generated-sources/annotations</generatedSourcesDirectory>
+					<annotationProcessorPaths>
+						<path>
+							<groupId>org.mapstruct</groupId>
+							<artifactId>mapstruct-processor</artifactId>
+							<version>1.5.5.Final</version>
+						</path>
+						<!-- If using Lombok, add this -->
+						<path>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+							<version>1.18.34</version>
+						</path>
+					</annotationProcessorPaths>
 				</configuration>
+			</plugin>
+
+			<!-- Spring Boot executable jar -->
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>repackage</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 
 			<!-- Protobuf / gRPC Codegen -->
@@ -167,14 +221,10 @@
 				<artifactId>protobuf-maven-plugin</artifactId>
 				<version>0.6.1</version>
 				<configuration>
-					<protocArtifact>
-						com.google.protobuf:protoc:${protobuf.version}:exe:${os.detected.classifier}
-					</protocArtifact>
+					<protocArtifact>com.google.protobuf:protoc:4.28.2:exe:${os.detected.classifier}</protocArtifact>
 					<pluginId>grpc-java</pluginId>
 					<pluginArtifact>
-						io.grpc:protoc-gen-grpc-java:${grpc.version}:exe:${os.detected.classifier}
-					</pluginArtifact>
-					<!-- Remove outputDirectories, use defaults -->
+						io.grpc:protoc-gen-grpc-java:1.68.0:exe:${os.detected.classifier}</pluginArtifact>
 				</configuration>
 				<executions>
 					<execution>
@@ -185,28 +235,26 @@
 					</execution>
 				</executions>
 			</plugin>
+
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>build-helper-maven-plugin</artifactId>
 				<version>3.3.0</version>
 				<executions>
 					<execution>
-						<id>add-source</id>
+						<id>add-annotations-sources</id>
 						<phase>generate-sources</phase>
 						<goals>
 							<goal>add-source</goal>
 						</goals>
 						<configuration>
 							<sources>
-								<source>${project.build.directory}/generated-sources/protobuf/java</source>
-								<source>
-									${project.build.directory}/generated-sources/protobuf/grpc-java</source>
+								<source>${project.build.directory}/generated-sources/annotations</source>
 							</sources>
 						</configuration>
 					</execution>
 				</executions>
 			</plugin>
-
 		</plugins>
 	</build>
 

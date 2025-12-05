@@ -1,6 +1,7 @@
 package com.gdn.training.product.infrastructure.usecase;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
@@ -28,7 +29,7 @@ public class GetProductByIdUseCaseImpl implements GetProductByIdUseCase {
     // methods
     @Override
     public ProductResponse execute(String id) throws ProductNotFoundException {
-        Optional<Product> product = productRepository.findById(id);
+        Optional<Product> product = productRepository.findById(UUID.fromString(id));
         if (product.isEmpty()) {
             throw new ProductNotFoundException(id);
         }

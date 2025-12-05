@@ -9,6 +9,7 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.gdn.training.product.domain.model.Product;
@@ -21,7 +22,9 @@ public class SolrProductSearchRepository {
     private final String collection;
 
     // Constructor
-    public SolrProductSearchRepository(SolrClient solrClient, String collection) {
+    public SolrProductSearchRepository(
+            SolrClient solrClient,
+            @Value("${solr.collection:products}") String collection) {
         this.solrClient = solrClient;
         this.collection = collection;
     }

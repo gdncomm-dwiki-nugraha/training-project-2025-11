@@ -1,22 +1,24 @@
 package com.gdn.training.product.infrastructure.persistence.entity;
 
-import java.time.Instant;
+import jakarta.persistence.*;
+import org.hibernate.annotations.UuidGenerator;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.util.UUID;
 
 @Entity
 @Table(name = "products")
 public class ProductEntity {
-    // Attributes
-    @Id
-    @Column(name = "product_id", length = 36, nullable = false)
-    private String productId;
 
-    @Column(name = "seller_id", length = 36, nullable = false)
-    private String sellerId;
+    @Id
+    @GeneratedValue
+    @UuidGenerator
+    @Column(name = "product_id", updatable = false, nullable = false)
+    private UUID productId;
+
+    @Column(name = "seller_id", nullable = false)
+    private UUID sellerId;
 
     @Column(name = "name", nullable = false)
     private String name;
@@ -28,104 +30,92 @@ public class ProductEntity {
     private String category;
 
     @Column(name = "price", nullable = false)
-    private double price;
+    private BigDecimal price; // ← Use BigDecimal, not double!
 
-    private int stock;
+    @Column(name = "stock", nullable = false)
+    private Integer stock = 0;
 
     @Column(name = "status")
-    private String status;
+    private String status = "ACTIVE";
 
     @Column(name = "created_at")
     private Instant createdAt;
 
-    // Constructor
+    // Constructors
     public ProductEntity() {
     }
 
-    public ProductEntity(String productId, String sellerId, String name, String description, String category,
-            double price, int stock, String status, Instant createdAt) {
-        this.productId = productId;
-        this.sellerId = sellerId;
-        this.name = name;
-        this.description = description;
-        this.category = category;
-        this.price = price;
-        this.stock = stock;
-        this.status = status;
-        this.createdAt = createdAt;
-    }
-
-    // Getters
-    public String getProductId() {
+    // Getters and Setters
+    public UUID getProductId() {
         return productId;
     }
 
-    public String getSellerId() {
+    public void setProductId(UUID productId) {
+        this.productId = productId;
+    }
+
+    public UUID getSellerId() {
         return sellerId;
+    }
+
+    public void setSellerId(UUID sellerId) {
+        this.sellerId = sellerId;
     }
 
     public String getName() {
         return name;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public String getCategory() {
-        return category;
-    }
-
-    public double getPrice() {
-        return price;
-    }
-
-    public int getStock() {
-        return stock;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
-
-    // Setters
-    public void setProductId(String productId) {
-        this.productId = productId;
-    }
-
-    public void setSellerId(String sellerId) {
-        this.sellerId = sellerId;
-    }
-
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     public void setDescription(String description) {
         this.description = description;
     }
 
+    public String getCategory() {
+        return category;
+    }
+
     public void setCategory(String category) {
         this.category = category;
     }
 
-    public void setPrice(double price) {
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 
-    public void setStock(int stock) {
+    public Integer getStock() {
+        return stock;
+    }
+
+    public void setStock(Integer stock) {
         this.stock = stock;
+    }
+
+    public String getStatus() {
+        return status;
     }
 
     public void setStatus(String status) {
         this.status = status;
     }
 
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
     public void setCreatedAt(Instant createdAt) {
         this.createdAt = createdAt;
     }
+
 }

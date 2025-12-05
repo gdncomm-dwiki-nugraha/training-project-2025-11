@@ -14,22 +14,20 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * Integration test for ProductRepositoryImpl using Testcontainers PostgreSQL.
- * Tests actual database interactions with real PostgreSQL instance.
- */
 @SpringBootTest
 @Testcontainers
-public class ProductRepositoryImplIntegrationTest {
+class ProductRepositoryImplIntegrationTest {
 
     @Container
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15-alpine")
+    static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15-alpine")
             .withDatabaseName("testdb")
             .withUsername("testuser")
             .withPassword("testpass");
@@ -42,30 +40,29 @@ public class ProductRepositoryImplIntegrationTest {
     }
 
     @Autowired
-    private ProductRepository productRepository;
+    ProductRepository productRepository;
 
     @Autowired
-    private ProductJpaRepository productJpaRepository;
+    ProductJpaRepository productJpaRepository;
 
     @BeforeEach
     void setUp() {
-        // Clean up database before each test
         productJpaRepository.deleteAll();
     }
 
     @Test
     void shouldSaveAndFindProductById() {
-        // Arrange
-        String productId = UUID.randomUUID().toString();
-        String sellerId = UUID.randomUUID().toString();
+        UUID productId = UUID.randomUUID();
+        UUID sellerId = UUID.randomUUID();
+
         ProductEntity entity = new ProductEntity();
         entity.setProductId(productId);
         entity.setSellerId(sellerId);
-        entity.setName("Integration Test Product");
-        entity.setDescription("Test Description");
-        entity.setCategory("test-category");
-        entity.setPrice(1000.0);
-        entity.setStock(50);
+        entity.setName("Test Product");
+        entity.setDescription("Test desc");
+        entity.setCategory("electronics");
+        entity.setPrice(BigDecimal.valueOf(999.99));
+        entity.setStock(100);
         entity.setStatus("ACTIVE");
         entity.setCreatedAt(Instant.now());
 
@@ -77,96 +74,73 @@ public class ProductRepositoryImplIntegrationTest {
         // Assert
         assertTrue(result.isPresent());
         Product product = result.get();
-        assertEquals(productId, product.getProductId().toString());
-        assertEquals("Integration Test Product", product.getName());
-        assertEquals("test-category", product.getCategory());
-        assertEquals(1000.0, product.getPrice());
-        assertEquals(50, product.getStock());
-        assertEquals(Product.Status.ACTIVE, product.getStatus());
+        assertEquals(productId.toString(), product.getProductId().toString());
+        assertEquals("Test Product", product.getName());
+        assertEquals(999.99, product.getPrice());
+        assertEquals(100, product.getStock());
     }
 
     @Test
-    void shouldReturnEmpty_WhenProductNotFound() {
-        // Arrange
-        String nonExistentId = UUID.randomUUID().toString();
-
-        // Act
-        Optional<Product> result = productRepository.findById(nonExistentId);
-
-        // Assert
+    void shouldReturnEmptyWhenProductNotFound() {
+        Optional<Product> result = productRepository.findById(UUID.randomUUID());
         assertTrue(result.isEmpty());
     }
 
     @Test
     void shouldHandleMultipleProducts() {
-        // Arrange
-        ProductEntity product1 = createTestEntity("Product 1", "cat1", 100.0, 10);
-        ProductEntity product2 = createTestEntity("Product 2", "cat2", 200.0, 20);
-        ProductEntity product3 = createTestEntity("Product 3", "cat1", 300.0, 30);
+        ProductEntity p1 = createTestEntity("Laptop", "tech", 1500.0, 5);
+        ProductEntity p2 = createTestEntity("Mouse", "tech", 25.0, 100);
+        ProductEntity p3 = createTestEntity("Keyboard", "tech", 75.0, 50);
 
-        productJpaRepository.save(product1);
-        productJpaRepository.save(product2);
-        productJpaRepository.save(product3);
+        productJpaRepository.saveAll(List.of(p1, p2, p3));
 
-        // Act
-        Optional<Product> result1 = productRepository.findById(product1.getProductId());
-        Optional<Product> result2 = productRepository.findById(product2.getProductId());
-        Optional<Product> result3 = productRepository.findById(product3.getProductId());
-
-        // Assert
-        assertTrue(result1.isPresent());
-        assertTrue(result2.isPresent());
-        assertTrue(result3.isPresent());
-        assertEquals("Product 1", result1.get().getName());
-        assertEquals("Product 2", result2.get().getName());
-        assertEquals("Product 3", result3.get().getName());
+        assertTrue(productRepository.findById(p1.getProductId()).isPresent());
+        assertTrue(productRepository.findById(p2.getProductId()).isPresent());
+        assertTrue(productRepository.findById(p3.getProductId()).isPresent());
     }
 
     @Test
     void shouldMapAllFieldsCorrectly() {
-        // Arrange
-        String productId = UUID.randomUUID().toString();
-        String sellerId = UUID.randomUUID().toString();
-        Instant createdAt = Instant.now();
+        UUID productId = UUID.randomUUID();
+        UUID sellerId = UUID.randomUUID();
+        Instant now = Instant.now();
 
         ProductEntity entity = new ProductEntity();
         entity.setProductId(productId);
         entity.setSellerId(sellerId);
-        entity.setName("Complete Product");
-        entity.setDescription("Full Description");
-        entity.setCategory("complete-cat");
-        entity.setPrice(9999.99);
-        entity.setStock(100);
+        entity.setName("Premium Product");
+        entity.setDescription("High-end item");
+        entity.setCategory("premium");
+        entity.setPrice(BigDecimal.valueOf(4999.99));
+        entity.setStock(10);
         entity.setStatus("INACTIVE");
-        entity.setCreatedAt(createdAt);
+        entity.setCreatedAt(now);
 
         productJpaRepository.save(entity);
 
-        // Act
         Optional<Product> result = productRepository.findById(productId);
-
-        // Assert
         assertTrue(result.isPresent());
+
         Product product = result.get();
-        assertEquals(productId, product.getProductId().toString());
-        assertEquals(sellerId, product.getSellerId().toString());
-        assertEquals("Complete Product", product.getName());
-        assertEquals("Full Description", product.getDescription());
-        assertEquals("complete-cat", product.getCategory());
-        assertEquals(9999.99, product.getPrice(), 0.001);
-        assertEquals(100, product.getStock());
+        assertEquals(productId, product.getProductId());
+        assertEquals(sellerId, product.getSellerId());
+        assertEquals("Premium Product", product.getName());
+        assertEquals("High-end item", product.getDescription());
+        assertEquals("premium", product.getCategory());
+        assertEquals(4999.99, product.getPrice());
+        assertEquals(10, product.getStock());
         assertEquals(Product.Status.INACTIVE, product.getStatus());
-        assertNotNull(product.getCreatedAt());
+        assertEquals(now, product.getCreatedAt());
     }
 
     private ProductEntity createTestEntity(String name, String category, double price, int stock) {
         ProductEntity entity = new ProductEntity();
-        entity.setProductId(UUID.randomUUID().toString());
-        entity.setSellerId(UUID.randomUUID().toString());
+        entity.setProductId(UUID.randomUUID());
+        entity.setSellerId(UUID.randomUUID());
         entity.setName(name);
-        entity.setDescription("Test description for " + name);
+        entity.setDescription("Desc for " + name);
         entity.setCategory(category);
-        entity.setPrice(price);
+        entity.setPrice(BigDecimal.valueOf(price));
         entity.setStock(stock);
         entity.setStatus("ACTIVE");
         entity.setCreatedAt(Instant.now());

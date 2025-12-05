@@ -2,6 +2,7 @@ package com.gdn.training.product.infrastructure.persistence.repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.stereotype.Repository;
 
@@ -30,9 +31,9 @@ public class ProductRepositoryImpl implements ProductRepository {
 
     // methods
     @Override
-    public Optional<Product> findById(String id) {
+    public Optional<Product> findById(UUID id) {
         return productJpaRepository.findById(id)
-                .map(ProductMapper::toDomain);
+                .map(ProductMapper.INSTANCE::toDomain);
     }
 
     @Override

@@ -34,7 +34,7 @@ public class GetProductByIdUseCaseImplTest {
                 Product.Status.ACTIVE,
                 Instant.now());
 
-        when(repo.findById(productId.toString())).thenReturn(Optional.of(domain));
+        when(repo.findById(productId)).thenReturn(Optional.of(domain));
 
         // Act
         ProductResponse response = useCase.execute(productId.toString());
@@ -42,7 +42,7 @@ public class GetProductByIdUseCaseImplTest {
         // Assert
         assertEquals(domain.getProductId().toString(), response.productId());
         assertEquals(domain.getName(), response.name());
-        verify(repo, times(1)).findById(productId.toString());
+        verify(repo, times(1)).findById(productId);
     }
 
     @Test
@@ -51,10 +51,10 @@ public class GetProductByIdUseCaseImplTest {
         ProductRepository repo = Mockito.mock(ProductRepository.class);
         GetProductByIdUseCaseImpl useCase = new GetProductByIdUseCaseImpl(repo);
 
-        String productId = UUID.randomUUID().toString();
+        UUID productId = UUID.randomUUID();
         when(repo.findById(productId)).thenReturn(Optional.empty());
 
         // Act + Assert
-        assertThrows(ProductNotFoundException.class, () -> useCase.execute(productId));
+        assertThrows(ProductNotFoundException.class, () -> useCase.execute(productId.toString()));
     }
 }
